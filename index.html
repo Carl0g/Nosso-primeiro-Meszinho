@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nosso Primeiro Mêszinho</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --purple: #9b4dca;
+            --blue: #3498db;
+            --pink: #ff6b6b;
+            --text: #ffffff;
+            --text-muted: #b3b3b3;
+            --card-bg: rgba(25, 25, 25, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text);
+            overflow: hidden;
+        }
+
+        #bgMusic { display: none; }
+
+        .bg-shapes {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.7;
+        }
+        .shape {
+            position: absolute;
+            filter: blur(70px);
+            animation: float 20s infinite alternate ease-in-out;
+        }
+        .shape1 { width: 350px; height: 350px; background: var(--purple); top: -5%; left: -10%; border-radius: 50%; }
+        .shape2 { width: 450px; height: 450px; background: var(--blue); bottom: -10%; right: -10%; border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; animation-delay: -5s; }
+        .shape3 { width: 250px; height: 250px; background: var(--pink); top: 35%; left: 35%; border-radius: 50%; animation-delay: -10s; opacity: 0.3; }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            100% { transform: translate(80px, 40px) rotate(45deg) scale(1.1); }
+        }
+
+        /* Nav Dots */
+        .nav-dots {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            display: flex; gap: 8px; z-index: 100; opacity: 0; transition: opacity 1s;
+            align-items: center;
+        }
+        .dot {
+            width: 8px; height: 8px; background: rgba(255,255,255,0.2); border-radius: 50%; transition: all 0.3s;
+        }
+        .dot.active { background: var(--text); transform: scale(1.4); }
+        
+        .secret-dot {
+            background: transparent !important; color: var(--purple); font-size: 0.9rem;
+            display: flex; align-items: center; justify-content: center;
+            animation: pulseSecret 2s infinite;
+        }
+        .secret-dot.active { color: var(--text); transform: scale(1.5); }
+        @keyframes pulseSecret { 0% { opacity: 0.5; } 50% { opacity: 1; text-shadow: 0 0 10px var(--purple); } 100% { opacity: 0.5; } }
+
+        .scroll-container {
+            display: flex; width: 100vw; height: 100vh; overflow-x: auto; overflow-y: hidden;
+            scroll-snap-type: x mandatory; scroll-behavior: smooth;
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+
+        .slide {
+            min-width: 100vw; height: 100vh; scroll-snap-align: center; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px; position: relative;
+        }
+
+        .landing-content { text-align: center; z-index: 10; }
+        .landing-content h1 {
+            font-size: 3.5rem; line-height: 1.1; margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .landing-content p { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; }
+        
+        .play-btn {
+            background: var(--text); color: var(--bg-dark); border: none; padding: 18px 40px; font-size: 1.2rem;
+            font-weight: 800; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+            transition: transform 0.3s; display: inline-flex; align-items: center; gap: 10px;
+        }
+        .play-btn:active { transform: scale(0.95); }
+
+        .swipe-hint {
+            position: absolute; bottom: 40px; font-size: 0.9rem; color: var(--text-muted); text-align: center;
+            opacity: 0; transition: opacity 1s; display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .arrow-right { font-size: 1.5rem; color: var(--text); animation: bounceRight 1.5s infinite; }
+        @keyframes bounceRight { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(15px); } }
+
+        .card {
+            background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 25px; padding: 30px 20px; width: 90vw;
+            max-width: 450px; text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.4); max-height: 85vh; overflow-y: auto;
+        }
+        .card::-webkit-scrollbar { display: none; }
+
+        h2 { font-size: 1.6rem; margin-bottom: 20px; color: var(--purple); display: flex; align-items: center; justify-content: center; gap: 10px; }
+        h3 { font-size: 1.2rem; margin-bottom: 10px; margin-top: 20px; }
+        p { font-size: 1rem; margin-bottom: 15px; color: var(--text-muted); line-height: 1.4; }
+
+        .highlight {
+            font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, var(--blue), var(--purple));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 5px 0;
+        }
+
+        /* Barras de Progresso Horizontais */
+        .progress-container { width: 100%; background: rgba(0,0,0,0.4); border-radius: 15px; height: 35px; margin: 10px 0 25px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .progress-fill { height: 100%; display: flex; align-items: center; padding-left: 15px; font-weight: bold; color: white; white-space: nowrap; }
+        .fill-50 { width: 50%; background: #555; }
+        .fill-200 { width: 100%; background: linear-gradient(90deg, var(--blue), var(--pink)); box-shadow: 0 0 15px var(--pink); }
+
+        .btn {
+            background: linear-gradient(135deg, var(--blue), #2980b9); color: white; border: none; padding: 15px 25px;
+            font-size: 1rem; font-weight: bold; border-radius: 30px; cursor: pointer; margin-top: 15px; width: 100%; transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-purple { background: linear-gradient(135deg, var(--purple), #7b3ba1); }
+        .btn-pink { background: linear-gradient(135deg, var(--pink), #e74c3c); }
+
+        .music-box { background: rgba(0,0,0,0.4); border-radius: 15px; padding: 15px; display: flex; align-items: center; gap: 15px; margin-bottom: 15px; text-align: left; }
+        .music-box img { width: 70px; height: 70px; border-radius: 10px; object-fit: cover; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        .music-details strong { display: block; font-size: 1.1rem; color: var(--text); }
+        .music-details span { font-size: 0.9rem; color: var(--text-muted); }
+        .song-row { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; margin-bottom: 8px; text-align: left; font-size: 0.95rem; }
+
+        .graph-container { position: relative; width: 100%; height: 160px; border-left: 2px solid var(--text-muted); border-bottom: 2px solid var(--text-muted); margin-top: 20px; }
+        .graph-line { width: 100%; height: 100%; }
+        .axis-label-y { position: absolute; top: -25px; left: -15px; font-size: 0.8rem; font-weight: bold; }
+        .axis-label-x { position: absolute; bottom: -25px; right: 0; font-size: 0.8rem; font-weight: bold; }
+
+        .bars-wrapper { display: flex; justify-content: space-evenly; align-items: flex-end; height: 180px; margin-top: 20px; width: 100%; }
+        .bar-col { display: flex; flex-direction: column; align-items: center; width: 45%; }
+        .bar { width: 60px; border-radius: 10px 10px 0 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 10px; font-weight: 800; font-size: 1.1rem; transition: height 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bar-carlos { background: var(--blue); height: 100px; }
+        .bar-julia { background: linear-gradient(to top, var(--pink), var(--purple)); height: 110px; }
+        .bar-altura-carlos { background: var(--blue); height: 180px; }
+        .bar-altura-julia { background: linear-gradient(to top, var(--pink), var(--purple)); height: 15px; } 
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .tab-btn { background: rgba(255,255,255,0.1); color: var(--text); border: none; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; }
+        .tab-btn.active { background: var(--purple); }
+        .movie-list { display: none; list-style: none; text-align: left; }
+        .movie-list.active { display: block; animation: fadeIn 0.4s; }
+        .movie-list li { background: rgba(0,0,0,0.3); margin-bottom: 8px; padding: 12px; border-radius: 10px; font-size: 0.9rem; border-left: 4px solid var(--blue); }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: var(--bg-dark); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: center; clip-path: circle(0% at 50% 90%); transition: clip-path 0.8s ease-in-out; padding: 20px; text-align: center; overflow-y: auto; }
+        .overlay.active { clip-path: circle(150% at 50% 90%); }
+        .overlay-julia { background: linear-gradient(135deg, #4a148c, var(--purple)); }
+        .overlay-carlos { background: linear-gradient(135deg, #0d47a1, var(--blue)); }
+        .overlay ul { text-align: left; width: 100%; max-width: 400px; list-style: none; margin-top: 15px; }
+        .overlay li { font-size: 0.95rem; margin-bottom: 10px; background: rgba(0,0,0,0.25); padding: 12px 15px; border-radius: 12px; }
+        .close-btn { position: absolute; top: 20px; right: 20px; font-size: 2rem; cursor: pointer; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; }
+
+        /* Pop-up do Story */
+        .story-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, #2c3e50, var(--purple)); padding: 30px 20px;
+            border-radius: 20px; text-align: center; z-index: 300; width: 85vw; max-width: 350px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8); border: 2px solid var(--pink);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .story-popup.active { transform: translate(-50%, -50%) scale(1); }
+
+        /* Avatares */
+        .avatars { display: flex; justify-content: center; gap: 20px; margin: 20px 0; }
+        .avatars img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--purple); background: rgba(255,255,255,0.1); }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=smooth-waters-115977.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="bg-shapes">
+        <div class="shape shape1"></div>
+        <div class="shape shape2"></div>
+        <div class="shape shape3"></div>
+    </div>
+
+    <div class="nav-dots" id="navDots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot secret-dot"><i class="fas fa-lock"></i></div>
+    </div>
+
+    <div class="scroll-container" id="scrollContainer">
+        
+        <section class="slide" id="slide1">
+            <div class="landing-content">
+                <h1>Nosso 1º<br>Mêszinho</h1>
+                <p>Uma retrospectiva de dois idiotas apaixonados.</p>
+                <button class="play-btn" onclick="startExperience()"><i class="fas fa-play"></i> Dar o Play</button>
+            </div>
+            <div class="swipe-hint" id="swipeHint">
+                Arraste para o lado
+                <i class="fas fa-chevron-right arrow-right"></i>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-hand-holding-heart"></i> O Veredito</h2>
+                
+                <h3 style="margin-top: 10px;">Chance de dar certo:</h3>
+                <div class="highlight">100%</div>
+                
+                <h3 style="margin-top: 20px;">Nível de Apaixonamento:</h3>
+                <div class="highlight">100%</div>
+                <p style="font-size: 0.8rem; margin-top:-10px;">(Dois idiotas oficiais)</p>
+                
+                <h3 style="margin-top: 20px;">Nível de Maldade Contida:</h3>
+                <div class="highlight" style="color: var(--pink);">400%</div>
+                <p style="font-size: 0.8rem; margin-top:-10px;">(Cuidado)</p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-smile-beam"></i> O Efeito Júlia</h2>
+                <p style="text-align: left; margin-bottom: 5px;">Minha felicidade <strong>antes</strong> de te conhecer:</p>
+                <div class="progress-container">
+                    <div class="progress-fill fill-50">50%</div>
+                </div>
+
+                <p style="text-align: left; margin-bottom: 5px; margin-top: 25px;">Minha felicidade <strong>depois</strong> de te conhecer:</p>
+                <div class="progress-container">
+                    <div class="progress-fill fill-200">200% 🚀</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-comments"></i> Assuntos mais falados</h2>
+                <div style="text-align: left; padding: 10px;">
+                    <div style="font-size: 2.2rem; font-weight: 900; color: var(--pink); margin-bottom: 5px;">1º Chiquinhisse 🤫</div>
+                    <div style="font-size: 1.8rem; font-weight: 800; color: var(--purple); margin-bottom: 5px;">2º Planos Futuros</div>
+                    <div style="font-size: 1.4rem; font-weight: 700; color: var(--blue); margin-bottom: 5px;">3º Borda da Mata</div>
+                    <div style="font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 5px;">4º Santa Rita</div>
+                    <div style="font-size: 0.9rem; font-weight: 400; color: var(--text-muted);">5º Neuron</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-chart-line"></i> Desempenho</h2>
+                <div style="margin-top: 20px;">
+                    <h3>Retorno sobre Investimento</h3>
+                    <div class="highlight">100%</div>
+                    <p>Lucro líquido garantido em chiquinhisse.</p>
+                </div>
+                <div style="margin-top: 30px;">
+                    <h3>NPS (Net Promoter Score)</h3>
+                    <div class="highlight" style="font-size: 2.5rem; color: var(--pink);">0%</div>
+                    <p>Porque eu não vou te recomendar e nem dividir com ninguém. 🤫</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-headphones-alt"></i> Sintonia Musical</h2>
+                <div class="highlight">80%</div>
+                <p>De compatibilidade sonora!</p>
+                
+                <h3 style="font-size: 1rem; text-align: left; margin-top: 20px;">Top 3 em Comum:</h3>
+                <div class="music-box">
+                    <img src="https://i.scdn.co/image/ab67616d0000b273b40ccf8eb18a20473aef23ea" alt="Djavan">
+                    <div class="music-details">
+                        <strong>1. Te Devoro</strong>
+                        <span>Djavan</span>
+                    </div>
+                </div>
+                <div class="song-row"><strong>2. November Rain</strong> - Guns N' Roses</div>
+                <div class="song-row"><strong>3. This I Love</strong> - Guns N' Roses</div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card" id="cardFoto">
+                <h2><i class="fas fa-camera-retro"></i> Nossa Foto</h2>
+                <p>O momento mais esperado da retrospectiva...</p>
+                <div id="photoContent" style="margin-top: 30px;">
+                    <button class="btn btn-purple" onclick="revelarFoto()"><i class="fas fa-eye"></i> Clique para revelar</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-grin-stars"></i> Duelo de Carisma</h2>
+                <div class="bars-wrapper">
+                    <div class="bar-col">
+                        <div class="bar bar-carlos" id="bar-carlos">100%</div>
+                        <p style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;">Eu</p>
+                    </div>
+                    <div class="bar-col">
+                        <div class="bar bar-julia" id="bar-julia">110%</div>
+                        <p style="margin-top: 10px; font-weight: bold; font-size: 0.9rem;">Você</p>
+                    </div>
+                </div>
+                <button class="btn" style="margin-top: 30px;" onclick="darSorriso()"><i class="fas fa-smile"></i> Dar sorriso</button>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-heartbeat"></i> Inflação Amorosa</h2>
+                <p style="font-size: 0.9rem;">O amor cresce de forma exponencial em função da quantidade de chiquinhisses feitas.</p>
+                <div class="graph-container">
+                    <span class="axis-label-y">Amor ∞</span>
+                    <span class="axis-label-x">Chiquinhisses</span>
+                    <svg class="graph-line" viewBox="0 0 100 100" preserveAspectRatio="none">
+                        <path d="M 0 100 Q 70 95 100 0" stroke="url(#grad1)" stroke-width="4" fill="none" stroke-linecap="round" />
+                        <defs>
+                            <linearGradient id="grad1" x1="0%" y1="100%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:var(--blue);stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:var(--pink);stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-ruler-combined"></i> Estatísticas Vitais</h2>
+                <p style="font-size: 0.95rem; margin-bottom: 25px;"><i class="fas fa-skull-crossbones"></i> Risco de envenenamento culinário: <strong style="color: #2ecc71;">0%</strong><br><span style="font-size: 0.8rem;">(O pai tem os dotes).</span></p>
+                
+                <h3 style="font-size: 1rem;"><i class="fas fa-arrows-alt-v"></i> Comparação de Altura</h3>
+                <div class="bars-wrapper" style="height: 180px; justify-content: center; gap: 30px;">
+                    <div class="bar-col" style="width: 30%;">
+                        <div class="bar bar-altura-carlos">1,88m</div>
+                        <p style="margin-top: 5px; font-size: 0.8rem;">Eu</p>
+                    </div>
+                    <div class="bar-col" style="width: 30%; justify-content: flex-end;">
+                        <div class="bar bar-altura-julia">1,68m</div>
+                        <p style="margin-top: 5px; font-size: 0.8rem;">Você</p>
+                    </div>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.8rem; font-style: italic; color: var(--pink);">"Minha comparação com você é igual a FEA contra a Filô: a FEA é muito maior."</p>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-film"></i> O que assistir?</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab('geral')">Geral</button>
+                    <button class="tab-btn" onclick="openTab('disney')">Disney</button>
+                    <button class="tab-btn" onclick="openTab('barbie')">Barbie</button>
+                    <button class="tab-btn" onclick="openTab('series')">Séries</button>
+                </div>
+
+                <ul id="geral" class="movie-list active">
+                    <li>🍿 Possuídos pelo mal</li>
+                    <li>🍿 Disque sequestro</li>
+                    <li>🍿 Inception</li>
+                    <li>🍿 Poderoso chefão</li>
+                    <li>🍿 Meu primeiro amor</li>
+                    <li>🍿 Diário de uma paixão</li>
+                    <li>🍿 O Fantástico sr. raposo</li>
+                    <li>🍿 Ponte para terabítia</li>
+                    <li>🍿 Como perder um homem em 10 dias</li>
+                    <li>🍿 Ela é demais</li>
+                    <li>🍿 Mary e Max</li>
+                </ul>
+                <ul id="disney" class="movie-list">
+                    <li>👑 Enrolados</li>
+                    <li>🏹 Valente</li>
+                    <li>🐸 A princesa e o sapo</li>
+                </ul>
+                <ul id="barbie" class="movie-list">
+                    <li>✨ Castelo de diamantes</li>
+                    <li>✨ O segredo das fadas</li>
+                    <li>✨ Escola de princesas</li>
+                    <li>✨ As 12 bailarinas</li>
+                </ul>
+                <ul id="series" class="movie-list">
+                    <li>📺 Tapas e beijos</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card">
+                <h2><i class="fas fa-ring"></i> Atualização de Status</h2>
+                
+                <div class="avatars">
+                    <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Carlos" alt="Carlos">
+                    <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=Julia&backgroundColor=ffd5dc" alt="Júlia">
+                </div>
+                
+                <h3 style="font-size: 1.5rem; color: var(--pink);">Seu cargo é: Esposa</h3>
+                <p style="font-style: italic; font-size: 0.9rem; margin-bottom: 30px;">"Já que você é egoísta, monogâmica e me ama... vai ser minha esposa."</p>
+
+                <button class="btn btn-pink" onclick="showStory()"><i class="fab fa-instagram"></i> Compartilhar Story</button>
+            </div>
+        </section>
+
+        <section class="slide">
+            <div class="card" style="border: 2px solid var(--purple); box-shadow: 0 0 30px rgba(155, 77, 202, 0.5);">
+                <h2><i class="fas fa-user-secret"></i> Arquivos Confidenciais</h2>
+                <p>Pronta para acessar dados altamente restritos sobre a gente?</p>
+                <button class="btn btn-purple" style="margin-top: 20px;" onclick="openOverlay('overlay-julia')"><i class="fas fa-unlock"></i> Desbloquear dossiê</button>
+            </div>
+        </section>
+
+    </div>
+
+    <div id="storyPopup" class="story-popup">
+        <div style="font-size: 4rem; margin-bottom: 10px;">💍🥂</div>
+        <h3 style="color: white; margin-bottom: 15px;">Alerta de Status</h3>
+        <p style="color: #ddd; margin-bottom: 25px;">Você entrou num relacionamento sério com Carlos!</p>
+        <button class="btn btn-purple" onclick="closeStory()"><i class="fas fa-check"></i> Aceitar destino</button>
+    </div>
+
+    <div id="overlay-julia" class="overlay overlay-julia">
+        <div class="close-btn" onclick="closeOverlay('overlay-julia')">&times;</div>
+        <h2 style="color: white;"><i class="fas fa-crown"></i> Seu Dossiê</h2>
+        <ul>
+            <li>💜 <strong>Cor:</strong> Roxo | ⚖️ <strong>Signo:</strong> Libriana</li>
+            <li>🍝 <strong>Comida:</strong> Spaghetti ao molho (fresca pra comer)</li>
+            <li>🍷 <strong>Bebida:</strong> Suco de uva</li>
+            <li>🎬 <strong>Favoritos:</strong> Inception & Friends</li>
+            <li>🌸 <strong>Estação:</strong> Inverno ou Primavera</li>
+            <li>🐶 <strong>Animais:</strong> Cachorro, coelho e pinguim (saudade do Pinguinho)</li>
+            <li>🗼 <strong>Sonho:</strong> Paris, pão de queijo e Torre Eiffel</li>
+            <li>😱 <strong>Fobia:</strong> Barata | 🦸 <strong>Poder:</strong> Teletransporte</li>
+        </ul>
+        <button class="btn" style="margin-top: 25px;" onclick="checkLogin()"><i class="fas fa-user-shield"></i> Veja as minhas curiosidades</button>
+    </div>
+
+    <div id="overlay-carlos" class="overlay overlay-carlos">
+        <div class="close-btn" onclick="closeOverlay('overlay-carlos')">&times;</div>
+        <h2 style="color: white;"><i class="fas fa-user-tie"></i> Meu Dossiê</h2>
+        <ul>
+            <li>🔵 <strong>Cor:</strong> Azul | ♓ <strong>Signo:</strong> Pisciano</li>
+            <li>🍕 <strong>Comida:</strong> Parmegiana e Pizza (Ganha pela barriga)</li>
+            <li>🍷 <strong>Bebida:</strong> Água, vinho tinto seco ou chopp</li>
+            <li>🎸 <strong>Hobbies:</strong> Cozinhar, Les Paul e judô</li>
+            <li>🎮 <strong>Jogos:</strong> Elden Ring e tabuleiro (tadinho no truco)</li>
+            <li>⚙️ <strong>Skills:</strong> Álcool de caldo de cana e achar CPF com equação linear</li>
+            <li>💼 <strong>Carreira:</strong> StartYou (Feano maldito)</li>
+            <li>🦉 <strong>Animal:</strong> Coruja (Vai Filô!) | 🐇 <strong>Medo:</strong> Coelho</li>
+            <li>📊 <strong>DNA:</strong> 40% cafajeste, 30% romântico, 30% nerd gastronômico</li>
+        </ul>
+    </div>
+
+    <script>
+        function startExperience() {
+            const audio = document.getElementById('bgMusic');
+            audio.volume = 0.4;
+            audio.play().catch(e => console.log("Bloqueio de autoplay evitado."));
+            
+            document.getElementById('navDots').style.opacity = '1';
+            document.getElementById('swipeHint').style.opacity = '1';
+            
+            const scrollContainer = document.getElementById('scrollContainer');
+            scrollContainer.scrollBy({ left: window.innerWidth, behavior: 'smooth' });
+        }
+
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+        const container = document.getElementById('scrollContainer');
+
+        container.addEventListener('scroll', () => {
+            let index = Math.round(container.scrollLeft / window.innerWidth);
+            dots.forEach(dot => dot.classList.remove('active'));
+            if(dots[index]) dots[index].classList.add('active');
+        });
+
+        function revelarFoto() {
+            const photoDiv = document.getElementById('photoContent');
+            photoDiv.innerHTML = `
+                <div style="font-size: 5rem; animation: fadeIn 1s;">😔</div>
+                <p style="margin-top: 15px; font-weight: bold; color: var(--text);">A gente não tem nenhuma juntos ainda...</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">(Fica a dica para o próximo mês!)</p>
+            `;
+        }
+
+        let sorrisoDado = false;
+        function darSorriso() {
+            if(sorrisoDado) return;
+            document.getElementById('bar-carlos').style.height = '120px'; 
+            document.getElementById('bar-carlos').innerText = '120%';
+            document.getElementById('bar-julia').style.height = '115px'; 
+            document.getElementById('bar-julia').innerText = '115%';
+            sorrisoDado = true;
+        }
+
+        function openTab(tabName) {
+            document.querySelectorAll('.movie-list').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        function showStory() {
+            document.getElementById('storyPopup').classList.add('active');
+        }
+
+        function closeStory() {
+            document.getElementById('storyPopup').classList.remove('active');
+        }
+
+        function openOverlay(id) { document.getElementById(id).classList.add('active'); }
+        function closeOverlay(id) { document.getElementById(id).classList.remove('active'); }
+
+        function checkLogin() {
+            const usuario = prompt("Acesso restrito. Insira o usuário (Dica: apelido carinhoso):");
+            if (usuario && usuario.toLowerCase().trim() === "mor") {
+                closeOverlay('overlay-julia');
+                setTimeout(() => openOverlay('overlay-carlos'), 600);
+            } else {
+                alert("Acesso negado! Tem certeza que você é minha namoradinha?");
+            }
+        }
+    </script>
+</body>
+  </html>
